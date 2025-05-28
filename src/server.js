@@ -3,12 +3,15 @@ import dotenv from 'dotenv';
 import { initDB } from './config/db.js';
 import rateLimiter from './middleware/rateLimiter.js'
 import transactionsRoutes from "./routes/transactionsRoute.js"
+import job from "./config/cron.js";
 
 // dotenv pkg configuration
 dotenv.config();
 
 // app instance created 
 const app = express();
+
+if (process.env.NODE_ENV === "production") job.start();
 
 // middleware -> use to parse incoming json payloads from http req like POST,PUT,PATCH
 app.use(rateLimiter)
@@ -22,6 +25,9 @@ app.use(express.json())
 
 const PORT = process.env.PORT || 5001;
 
+app.get("/api/health", (req, res) => {
+    res.status(200).json({ status: "ok" })
+})
 
 
 
